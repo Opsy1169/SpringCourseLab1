@@ -1,58 +1,65 @@
 package com.luxoft.springioc.lab1.model;
 
-import static org.junit.Assert.*;
-
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
-import com.luxoft.springioc.lab1.model.Country;
-import com.luxoft.springioc.lab1.model.Person;
-import com.luxoft.springioc.lab1.model.UsualPerson;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 public class HelloWorldTest {
 
-	protected static final String APPLICATION_CONTEXT_XML_FILE_NAME = "classpath:application-context.xml";
+    protected static final String APPLICATION_CONTEXT_XML_FILE_NAME = "classpath:application-context.xml";
 
-	private UsualPerson expectedPerson;
+    private UsualPerson expectedPerson;
 
-	private AbstractApplicationContext context;
+    private AbstractApplicationContext context;
 
-	@Before
-	public void setUp() throws Exception {
-		context = new FileSystemXmlApplicationContext(new String[] { APPLICATION_CONTEXT_XML_FILE_NAME });
-		expectedPerson = getExpectedPerson();
-	}
+    @Before
+    public void setUp() throws Exception {
+        context = new FileSystemXmlApplicationContext(new String[]{APPLICATION_CONTEXT_XML_FILE_NAME});
+        expectedPerson = getExpectedPerson();
+    }
 
-	@Test
-	public void testInitPerson() {
-		UsualPerson person = (UsualPerson) context.getBean("person", Person.class);
+    @Test
+    public void testInitPerson() {
+        List<UsualPerson> persons = new ArrayList<>();
+        persons.add((UsualPerson) context.getBean("person", Person.class));
+        persons.add((UsualPerson) context.getBean("personByConstructor", Person.class));
+        persons.add((UsualPerson) context.getBean("personByName", Person.class));
+        persons.add((UsualPerson) context.getBean("personByType", Person.class));
+        persons.add((UsualPerson) context.getBean("personFullConstructor", Person.class));
 
-		System.out.println("-->" + person.getCountry().getA());
-//		assertEquals(expectedPerson, person);
-//		System.out.println(person);
-	}
+        for (UsualPerson person : persons) {
+            System.out.println("-->" + person.getCountry().getA());
+            assertEquals(expectedPerson, person);
+        }
+    }
 
-	private UsualPerson getExpectedPerson() {
-		UsualPerson person = new UsualPerson();
-		person.setAge(35);
-		person.setName("John Smith");
+    private UsualPerson getExpectedPerson() {
+        UsualPerson person = new UsualPerson();
+        person.setAge(35);
+        person.setName("John Smith");
 
-		Country country = new Country();
-		country.setId(1);
-		country.setName("Russia");
-		country.setCodeName("RU");
+        Country country = new Country();
+        country.setId(1);
+        country.setName("Russia");
+        country.setCodeName("RU");
 
-		System.out.println("-->" + country.getA());
+        System.out.println("-->" + country.getA());
 
-		person.setCountry(country);
+        person.setCountry(country);
 
-		return person;
-	}
+        return person;
+    }
 
-	@After
-	public void tearDown() throws Exception {
-		if (context != null)
-			context.close();
-	}
+    @After
+    public void tearDown() throws Exception {
+        if (context != null)
+            context.close();
+    }
 }
